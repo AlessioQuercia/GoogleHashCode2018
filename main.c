@@ -14,21 +14,27 @@ void main()
 	for (int i=0; i<SMP.F; i++)
 		DIST_S[i] = calloc(SMP.N, sizeof(int));
 
-	int B = 2;		// Number of best rides to select for each vehicle (B <= F <= N)
+	int NB = SMP.F;		// Number of best rides to select for each vehicle (B <= F <= N)
 
-	int **BEST_D = calloc(SMP.F, sizeof(int *));;		// Best rides for each vehicle
-
-	for (int i = 0; i < SMP.F; i++)
-		BEST_D[i] = calloc(B, sizeof(int));
-
-	int **BEST_IDR = calloc(SMP.F, sizeof(int *));;		// Best rides for each vehicle
+	couple **REW = calloc(SMP.F, sizeof(int *));		// Best rides for each vehicle
 
 	for (int i = 0; i < SMP.F; i++)
-		BEST_IDR[i] = calloc(B, sizeof(int));
+		REW[i] = calloc(SMP.N, sizeof(int));
 
-	initialize_best(BEST_D, BEST_IDR, SMP.F, B);		// Initializes BEST_D and BEST_IDR
+	couple **BEST = calloc(SMP.F, sizeof(int *));		// Best rides for each vehicle
 
-	initialize_distances_s(DIST_S, &SMP, BEST_D, BEST_IDR, B);		// Initializes DIST_S and BEST
+	for (int i = 0; i < SMP.F; i++)
+		BEST[i] = calloc(NB, sizeof(int));
 
-	start_simulation(&SMP, DIST_S, BEST_D, BEST_IDR, B);	// Start the simulation
+	int slots = NB;
+
+	int *pslots = &slots;
+
+	initialize_best(BEST, SMP.F, NB);		// Initializes BEST_D and BEST_IDR
+
+	initialize_distances_s(DIST_S, &SMP, BEST, REW, 0, NB, pslots);		// Initializes DIST_S and BEST
+
+	assign_rides(&SMP, DIST_S, BEST, NB);
+
+	start_simulation(&SMP, DIST_S, REW, BEST, NB);	// Start the simulation
 }

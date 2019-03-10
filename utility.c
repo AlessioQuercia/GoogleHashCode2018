@@ -46,6 +46,7 @@ void load_data(char *data_file, sample *SMP)
 			SMP->rides[i-1].s = split_line[4];
 			SMP->rides[i-1].f = split_line[5];
 			SMP->rides[i-1].dd = distance(SMP->rides[i - 1].a, SMP->rides[i - 1].b, SMP->rides[i - 1].x, SMP->rides[i - 1].y);
+			SMP->rides[i-1].dt = -1;
 			SMP->rides[i-1].done = 0;
 			SMP->rides[i-1].id = i-1;
 

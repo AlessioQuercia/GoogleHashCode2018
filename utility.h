@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <limits.h>
+//#include <limits.h>
 
 // Structure representing a ride
 typedef struct ride_s
@@ -15,7 +15,8 @@ typedef struct ride_s
 	int y;   // the column of the finish intersection (0 <= y < C)
 	int s;   // the earliest start (0 <= s < T)
 	int f;   // the latest finish (0 <= f <= T), (f >= s + |x-a| + |y-b|)
-	int dd;   // current distance from the current ride destination point (starting from the starting point)
+	int dd;   // distance between the ride starting point and the ride destination point (|x-a| + |y-b|)
+	int dt;	  // total distance from the vehicle starting position (when this ride is assigned to it) and the ride destination point
 	int done;   // current state of the ride (0 if to do; 1 if already done)
 	int id;	 // ride id (0 <= id < N)
 } ride;
@@ -45,6 +46,14 @@ typedef struct sample_s
 	ride *rides; // vector of the pre-booked rides
 	vehicle *vehicles; // vector of the vehicles
 } sample;
+
+
+// Structure representing a couple (REWARD, ID_RIDE)
+typedef struct couple_s
+{
+	int rew;   // reward
+	int idr;   // id_ride
+} couple;
 
 
 // Loads the data from the file data_file into the sample SMP
