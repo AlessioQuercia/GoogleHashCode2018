@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+//#include <setjmp.h>
 //#include <limits.h>
 
 // Structure representing a ride
@@ -31,6 +32,8 @@ typedef struct vehicle_s
 	int ds;   // current distance from the current ride starting point
 	int av;   // current availability of the vehicle (0 if available; 1 if busy)
 	int id;   // vehicle id (0 <= id < F)
+	int nrd;	  // number of rides already done
+	int *idrd;  // id of the rides already done
 } vehicle;
 
 
@@ -64,6 +67,13 @@ void split_str(char *string, char *delim, int *split_string);
 
 // Computes and returns the distance between beginning intersection [a,b] and destination intersection [x,y]
 int distance(int a, int b, int x, int y);
+
+// Stores the output in the file data_file
+void store_output(char *data_file, sample *SMP);
+
+// Computes the score, given an output file with the required format
+void compute_score(char *output_file, sample *SMP);
+
 
 // Prints the data inside the sample SMP
 // void print_data(sample *SMP);

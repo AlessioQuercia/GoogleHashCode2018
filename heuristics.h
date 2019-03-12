@@ -16,10 +16,13 @@ void assign_rides(sample *SMP, int **DIST_S, couple **BEST, int NB);
 void update_distances(int **DIST_S, couple **BEST);
 
 // Updates the vehicles current positions
-void move_single_vehicle(vehicle *v);
+void move_single_vehicle(sample *SMP, int **DIST_S, vehicle *v, couple **BEST, int NB);
 
 // Updates the vehicles current positions
-void move_vehicles(sample *SMP);
+void move_vehicles(sample *SMP, int **DIST_S, couple **BEST, int NB);
+
+// Allocates the required structures (DIST_S, REW, BEST) 
+void allocate_structures(int **DIST_S, couple **REW, couple **BEST, sample *SMP, int NB);
 
 // Initializes the distances from the vehicles to the starting points
 void initialize_best(couple **BEST, int F, int B);

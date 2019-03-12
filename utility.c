@@ -2,6 +2,8 @@
 
 void load_data(char *data_file, sample *SMP)
 {
+	printf("LOADING DATA \n");
+
 	FILE * fp;
 	char * line = NULL;
 	size_t len = 0;
@@ -22,7 +24,7 @@ void load_data(char *data_file, sample *SMP)
 
 	while ((read = getline(&line, &len, fp)) != -1) {
 		//printf("Retrieved line of length %zu:\n", read);
-		printf("%s", line);
+		//printf("%s", line);
 
 		split_str(line, delim, split_line);
 
@@ -56,27 +58,11 @@ void load_data(char *data_file, sample *SMP)
 			//SMP->vehicles[i-1].ds = 0;
 			SMP->vehicles[i-1].av = 0;
 			SMP->vehicles[i-1].id = i-1;
+			SMP->vehicles[i-1].nrd = 0;
+			SMP->vehicles[i-1].idrd = calloc(SMP->N, sizeof(int));
 		}
 
 		i++;
-	}
-
-	printf("R: %d\n", SMP->R);
-	printf("C: %d\n", SMP->C);
-	printf("F: %d\n", SMP->F);
-	printf("N: %d\n", SMP->N);
-	printf("B: %d\n", SMP->B);
-	printf("T: %d\n", SMP->T);
-
-	for (int i = 0; i < SMP->N; i++)
-	{
-		printf("Ride %d:\n", i);
-		printf("a: %d\n", SMP->rides[i].a);
-		printf("b: %d\n", SMP->rides[i].b);
-		printf("x: %d\n", SMP->rides[i].x);
-		printf("y: %d\n", SMP->rides[i].y);
-		printf("s: %d\n", SMP->rides[i].s);
-		printf("f: %d\n", SMP->rides[i].f);
 	}
 
 	fclose(fp);
@@ -106,4 +92,51 @@ void split_str(char *string, char *delim, int *split_string)
 
 		i++;
 	}
+}
+
+
+// Stores the output in the file data_file
+void store_output(char *data_file, sample *SMP)
+{
+	printf("STORING DATA \n");
+
+	FILE * fp;
+
+	fp = fopen(data_file, "w");
+
+	setbuf(fp, NULL);
+
+	if (fp == NULL) return;
+
+	for (int i = 0; i < SMP->F; i++)
+	{
+		//printf("%d ", SMP->vehicles[i].nrd);
+		
+		fprintf(fp, "%d ", SMP->vehicles[i].nrd);
+
+		for (int j = 0; j < SMP->N; j++)
+		{
+			if (SMP->vehicles[i].idrd[j] == 1)
+			{
+				//printf("%d ", j);
+				fprintf(fp, "%d ", j);
+			}
+		}
+
+		//printf("\n");
+		fprintf(fp, "\n");
+	}
+
+	fclose(fp);
+}
+
+// Computes the score, given an output file with the required format
+void compute_score(char *output_file, sample *SMP)
+{
+	printf("COMPUTING SCORE: ");
+
+	int total_score = 0;
+
+
+	printf("%d", total_score);
 }
