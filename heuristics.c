@@ -30,6 +30,8 @@ int reward(vehicle v, ride r, int dist, int t, int T, int B)
 
 void start_simulation(sample *SMP, int **DIST_S, couple **REW, couple **BEST, int NB)
 {
+	printf("SIMULATION STARTED\n");
+
 	int t = 0;
 
 	while (t < SMP->T)
@@ -41,6 +43,8 @@ void start_simulation(sample *SMP, int **DIST_S, couple **REW, couple **BEST, in
 
 		t++;
 	}
+
+	printf("SIMULATION ENDED\n");
 
 	//printf("Distances from vehicles to starting points\n");
 	//for (int i = 0; i < SMP->F; i++)
@@ -123,13 +127,6 @@ void assign_rides(sample *SMP, int **DIST_S, couple **BEST, int NB)
 
 
 
-void update_distances(int **DIST_S, couple **BEST)
-{
-
-}
-
-
-
 // Moves the vehicle v to the next step
 void move_single_vehicle(sample *SMP, int **DIST_S, vehicle *v, couple **BEST, int NB)
 {
@@ -203,7 +200,7 @@ void initialize_best(couple **BEST, int F, int NB)
 // Initializes the distances from the vehicles to the starting points
 void initialize_distances_s(int **DIST_S, sample *SMP, couple **BEST, couple **REW, int t, int NB, int *slots)
 {
-	printf("INITIALIZING DISTANCES\n");
+	printf("INITIALIZING DISTANCES, REWARDS AND SELECTING THE BEST ONES\n");
 	for (int i = 0; i < SMP->F; i++)
 	{
 		for (int j = 0; j < SMP->N; j++)
@@ -252,7 +249,7 @@ void allocate_structures(int **DIST_S, couple **REW, couple **BEST, sample *SMP,
 
 
 
-// Assigns the id of the ride to the BEST ones, if it is considered one of the best B
+// Assigns the id of the ride to the BEST ones, if it is considered one of the best NB
 void assign_if_best(sample *SMP, couple **BEST, couple **REW, int idv, int idr, int NB, int *slots)
 {
 	for (int i = 0; i < NB; i++)
@@ -287,4 +284,24 @@ void assign_if_best(sample *SMP, couple **BEST, couple **REW, int idv, int idr, 
 			}
 		}
 	}
+}
+
+
+
+// Updates the distances in DIST_S
+void update_distances()
+{
+
+}
+
+// Updates the rewards in REW
+void update_rewards()
+{
+
+}
+
+// Updates the best rides for each vehicle in BEST
+void update_best()
+{
+
 }

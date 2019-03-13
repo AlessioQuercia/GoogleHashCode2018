@@ -12,9 +12,6 @@ void assign_single_ride(sample *SMP, int **DIST_S, vehicle *v, couple **BEST, in
 // Assign to each available vehicle the best ride
 void assign_rides(sample *SMP, int **DIST_S, couple **BEST, int NB);
 
-// Updates the values in the distance matrix DIST and the best rides for the vehicles in the matrix BEST
-void update_distances(int **DIST_S, couple **BEST);
-
 // Updates the vehicles current positions
 void move_single_vehicle(sample *SMP, int **DIST_S, vehicle *v, couple **BEST, int NB);
 
@@ -35,5 +32,14 @@ void assign_if_best(sample *SMP, couple **BEST, couple **REW, int idv, int idr, 
 
 // Returns the reward given by assigning the ride r to the vehicle v at time t
 int reward(vehicle v, ride r, int dist, int t, int T, int B);
+
+// Updates the values in the distance matrix DIST and the best rides for the vehicles in the matrix BEST
+void update_distances();
+
+// Updates the rewards in REW
+void update_rewards();
+
+// Updates the best rides for each vehicle in BEST
+void update_best();
 
 #endif   /* __HEURISTICS_H */

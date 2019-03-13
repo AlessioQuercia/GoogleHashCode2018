@@ -137,6 +137,45 @@ void compute_score(char *output_file, sample *SMP)
 
 	int total_score = 0;
 
+	for (int i = 0; i < SMP->F; i++)
+	{
+		int v_x = 0;
+		int v_y = 0;
+		int v_score = 0;
 
+		for (int j = 0; j < SMP->N; j++)
+		{
+			if (SMP->vehicles[i].idrd[j] == 0)
+				continue;
+			//printf("RIDE: %d\n", SMP->rides[j].id);
+			int r_score = 0;
+			int ds = distance(v_x, v_y, SMP->rides[j].a, SMP->rides[j].b);
+
+			// BONUS POINTS FOR ARRIVING IN TIME
+			if (ds <= SMP->rides[j].s)
+				r_score += SMP->B;
+
+			//printf("VEHICLE: %d\nBONUS: %d ", i, r_score);
+
+			// POINTS FOR THE RIDE IN TIME
+			if (ds + SMP->rides[j].dd < SMP->rides[j].f)
+				r_score += SMP->rides[j].dd;
+
+			//printf("DISTANCE: %d\n", SMP->rides[j].dd);
+
+			//printf("POINTS: %d\n", r_score);
+
+			v_x = SMP->rides[j].x;
+			v_y = SMP->rides[j].y;
+
+			v_score += r_score;
+		}
+
+		//printf("VEHICLE SCORE: %d\n", v_score);
+
+		total_score += v_score;
+	}
 	printf("%d", total_score);
+
+	printf(" EXPERIMENTAL");
 }
