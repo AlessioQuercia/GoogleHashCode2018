@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <setjmp.h>
-//#include <limits.h>
+#include <limits.h>
 
 // Structure representing a ride
 typedef struct ride_s
@@ -54,9 +54,32 @@ typedef struct sample_s
 // Structure representing a couple (REWARD, ID_RIDE)
 typedef struct couple_s
 {
-	int rew;   // reward
+	int val;   // value (reward, distance, ...)
 	int idr;   // id_ride
 } couple;
+
+
+// Structure representing a couple (float, float)
+typedef struct fcouple_s
+{
+	float x;   // x
+	float y;   // y
+} fcouple;
+
+// Structure representing a couple (float, int)
+typedef struct mixcouple_s
+{
+	float val;   // value
+	int idr;	 // id
+} mixcouple;
+
+// Structure representing a couple (float, int)
+typedef struct mixtriple_s
+{
+	float val;   // value
+	int idr;	 // id
+	int t;		 // time
+} mixtriple;
 
 
 // Loads the data from the file data_file into the sample SMP

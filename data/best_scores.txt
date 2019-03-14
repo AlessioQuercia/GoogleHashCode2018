@@ -1,0 +1,53 @@
+V1 (FIRST VERSION)
+a_example: 10 in 0.012000 seconds
+b_should_be_easy: 176851 in 0.043000 seconds (1 BEST + pseudo-random) or 0.170000 (N BEST)
+c_no_hurry: 7942998 in 2.099000 seconds (1 BEST + pseudo-random) or 864.673000 seconds (14:41 minutes) (N BEST)
+d_metropolis: 8684643 in 2.910000 seconds (1 BEST + pseudo-random) or ...too much?
+e_high_bonus: 21521600 in 3.401000 seconds (1 BEST + pseudo-random)
+Totale: 38326102
+
+
+
+V1 (BEST_REWARDS + ASSIGN BEST OR RANDOM)
+a_example: 10 in 0.011000 seconds
+b_should_be_easy: 176876 in 0.041000 seconds
+c_no_hurry: 7989652 in 2.259000 seconds
+d_metropolis: 8697024 in 3.275000 seconds
+e_high_bonus: 21511064 in 3.710000 seconds
+Totale: 38374626
+
+V1 (BEST_REWARDS/TOTAL_TIME + ASSIGN BEST OR RANDOM)
+a_example: 10 in 0.011000 seconds
+b_should_be_easy: 177413 in 0.045000 seconds
+c_no_hurry: 7936165 in 2.657000 seconds
+d_metropolis: 8675085 in 3.708000 seconds
+e_high_bonus: 21500597 in 4.331000 seconds
+Totale: 38289270
+
+
+
+V1 (BEST_REWARDS + ASSIGN BEST AND UPDATE)
+a_example: 10 in 0.012000 seconds
+b_should_be_easy: 177323 in 0.079000 seconds
+c_no_hurry: 7977257 in 3.826000 seconds
+d_metropolis: 7265617 in 4.436000 seconds
+e_high_bonus: 21514969 in 5.884000 seconds
+Totale: 36935176
+
+V1 (BEST_REWARDS/TOTAL_TIME + ASSIGN BEST AND UPDATE)
+a_example: 10 in 0.014000 seconds
+b_should_be_easy: 177408 in 0.046000 seconds
+c_no_hurry: 7940604 in 3.849000 seconds
+d_metropolis: 7288437 in 4.436000 seconds
+e_high_bonus: 21513897 in 4.466000 seconds
+Totale: 36920356
+
+
+
+V2
+a_example: 10 in 0.008000 seconds
+b_should_be_easy: 179638 in 0.047000 seconds
+c_no_hurry: 8138707 in 2.317000 seconds
+d_metropolis: 9215564 in 3.068000 seconds
+e_high_bonus: 21507553 in 3.426000 seconds
+Totale: 39041472
