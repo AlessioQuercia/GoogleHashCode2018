@@ -41,7 +41,7 @@ int wait_time(sample *SMP, int **DIST_S, int idv, int idr, int t)
 
 
 // Starts a simulation with wait times
-void start_simulation_v2(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int NB, int *slots)
+void start_simulation_v2(sample *SMP, int **DIST_S, couple **REW, mixquad **BEST, int **WAIT, int NB, int *slots)
 {
 	printf("SIMULATION V2 STARTED\n");
 	// For each vehicle
@@ -70,7 +70,7 @@ void start_simulation_v2(sample *SMP, int **DIST_S, couple **REW, mixtriple **BE
 }
 
 // Assigns a ride according to a choice_criterium and returns the time required to complete the ride
-int assign_ride(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int idv, int t)
+int assign_ride(sample *SMP, int **DIST_S, couple **REW, mixquad **BEST, int **WAIT, int idv, int t)
 {
 	int required_time = INT_MAX - t;
 
@@ -101,10 +101,10 @@ void move(sample *SMP, int idv)
 }
 
 
-void update_rides(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int idv, int t)
+void update_rides(sample *SMP, int **DIST_S, couple **REW, mixquad **BEST, int **WAIT, int idv, int t)
 {
 	// Re-initialize BEST
-	mixtriple mc = { .val = INT_MAX,.idr = -1, .t=INT_MAX };
+	mixquad mc = { .val = INT_MAX,.idr = -1, .t = INT_MAX, .rt = INT_MIN };
 
 	BEST[idv][0] = mc;
 
@@ -128,7 +128,8 @@ void update_rides(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int
 		REW[idv][i] = c;
 
 		// Choice criterium to store the best ride in BEST
-		min_wait_time(SMP, DIST_S, REW, BEST, WAIT, idv, i, t);
+		//min_wait_time(SMP, DIST_S, REW, BEST, WAIT, idv, i, t);	// BEST mixtriple
+		min_wait_time_ratio_reward_required_time(SMP, DIST_S, REW, BEST, WAIT, idv, i, t);	// BEST mixquad
 	}
 
 	//printf("%f, %d, %d\n", BEST[idv][0].val, BEST[idv][0].idr, BEST[idv][0].t);
@@ -136,7 +137,7 @@ void update_rides(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int
 
 
 // Initializes the required structures for v2
-void initialize_structures(sample *SMP, int **DIST_S, mixtriple **BEST, couple **REW, int **WAIT, int t)
+void initialize_structures(sample *SMP, int **DIST_S, mixquad **BEST, couple **REW, int **WAIT, int t)
 {
 	printf("INITIALIZING STRUCTURES\n");
 	for (int i = 0; i < SMP->F; i++)
@@ -154,10 +155,28 @@ void initialize_structures(sample *SMP, int **DIST_S, mixtriple **BEST, couple *
 			REW[i][j] = c;	// Initialize rewards
 
 			// Choice criterium to store the best ride in BEST
-			min_wait_time(SMP, DIST_S, REW, BEST, WAIT, i, j, t);
+			//min_wait_time(SMP, DIST_S, REW, BEST, WAIT, i, j, t);		// BEST mixtriple
+			min_wait_time_ratio_reward_required_time(SMP, DIST_S, REW, BEST, WAIT, i, j, t);	// BEST mixquad
 		}
 	}
 }
+
+
+// Initializes the distances from the vehicles to the starting points
+void initialize_best_v2(mixquad **BEST, int F, int NB)
+{
+	printf("INITIALIZING BEST\n");
+	for (int i = 0; i < F; i++)
+	{
+		for (int j = 0; j < NB; j++)
+		{
+			mixquad c = { .val = INT_MAX,.idr = -1,.t = INT_MAX, .rt = INT_MIN };
+			BEST[i][j] = c;
+		}
+	}
+}
+
+
 
 
 void start_simulation(sample *SMP, int **DIST_S, couple **REW, mixcouple **BEST, int NB, int *slots)
@@ -408,21 +427,6 @@ void initialize_best(mixcouple **BEST, int F, int NB)
 	}
 }
 
-
-
-// Initializes the distances from the vehicles to the starting points
-void initialize_best_v2(mixtriple **BEST, int F, int NB)
-{
-	printf("INITIALIZING BEST\n");
-	for (int i = 0; i < F; i++)
-	{
-		for (int j = 0; j < NB; j++)
-		{
-			mixtriple c = { .val = INT_MAX, .idr = -1, .t = INT_MAX };
-			BEST[i][j] = c;
-		}
-	}
-}
 
 
 // Initializes the distances from the vehicles to the starting points

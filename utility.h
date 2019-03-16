@@ -81,6 +81,15 @@ typedef struct mixtriple_s
 	int t;		 // time
 } mixtriple;
 
+// Structure representing a couple (float, int)
+typedef struct mixquad_s
+{
+	float val;   // value
+	int idr;	 // id
+	int t;		 // time
+	float rt;	 // ratio
+} mixquad;
+
 
 // Loads the data from the file data_file into the sample SMP
 void load_data(char *data_file, sample *SMP);

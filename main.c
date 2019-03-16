@@ -13,14 +13,14 @@ void main()
 	//char input[] = "data/b_should_be_easy.in";
 	//char output[] = "data/b_should_be_easy.out";
 
-	//char input[] = "data/c_no_hurry.in";
-	//char output[] = "data/c_no_hurry.out";
+	char input[] = "data/c_no_hurry.in";
+	char output[] = "data/c_no_hurry.out";
 
 	//char input[] = "data/d_metropolis.in";
 	//char output[] = "data/d_metropolis.out";
 
-	char input[] = "data/e_high_bonus.in";
-	char output[] = "data/e_high_bonus.out";
+	//char input[] = "data/e_high_bonus.in";
+	//char output[] = "data/e_high_bonus.out";
 
 	load_data(input, &SMP);		// Loads the sample
 
@@ -75,11 +75,11 @@ void main()
 
 	// V2
 
-	mixtriple **BEST = calloc(SMP.F, sizeof(mixtriple *));		// Best rides for each vehicle
+	mixquad **BEST = calloc(SMP.F, sizeof(mixquad *));		// Best rides for each vehicle
 
 	for (int i = 0; i < SMP.F; i++)
 	{
-		BEST[i] = calloc(NB, sizeof(mixtriple));
+		BEST[i] = calloc(NB, sizeof(mixquad));
 	}
 
 	initialize_best_v2(BEST, SMP.F, NB);		// Initializes BEST

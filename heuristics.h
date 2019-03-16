@@ -59,21 +59,21 @@ fcouple compute_average_dist(ride *rides, int n);
 
 // V2
 // Initializes the distances from the vehicles to the starting points
-void initialize_best_v2(mixtriple **BEST, int F, int NB);
+void initialize_best_v2(mixquad **BEST, int F, int NB);
 
 // Initializes the required structures for v2
-void initialize_structures(sample *SMP, int **DIST_S, mixtriple **BEST, couple **REW, int **WAIT, int t);
+void initialize_structures(sample *SMP, int **DIST_S, mixquad **BEST, couple **REW, int **WAIT, int t);
 
 // Starts a simulation with wait times
-void start_simulation_v2(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int NB, int *slots);
+void start_simulation_v2(sample *SMP, int **DIST_S, couple **REW, mixquad **BEST, int **WAIT, int NB, int *slots);
 
 // Assigns a ride according to a choice_criterium and returns the time required to complete the ride
-int assign_ride(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int idv, int t);
+int assign_ride(sample *SMP, int **DIST_S, couple **REW, mixquad **BEST, int **WAIT, int idv, int t);
 
 // Makes an entire ride
 void move(sample *SMP, int idv);
 
 // Updates the necessary structures
-void update_rides(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int idv, int t);
+void update_rides(sample *SMP, int **DIST_S, couple **REW, mixquad **BEST, int **WAIT, int idv, int t);
 
 #endif   /* __HEURISTICS_H */
