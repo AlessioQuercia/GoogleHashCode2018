@@ -6,6 +6,7 @@
 #include <string.h>
 //#include <setjmp.h>
 #include <limits.h>
+#include <math.h>
 
 // Structure representing a ride
 typedef struct ride_s

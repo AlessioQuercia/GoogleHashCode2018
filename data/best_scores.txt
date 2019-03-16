@@ -60,10 +60,20 @@ d_metropolis: 10039911 in 2.826000 seconds
 e_high_bonus: 21510242 in 3.860000 seconds
 Totale: 42176480
 
-V2 (MIN_WAIT_TIME -> MAX_REWARD/REQUIRED_TIME -> MIN_REQUIRED_TIME)
+V2 (MIN_WAIT_TIME -> MAX_REWARD/REQUIRED_TIME) 
+== (MIN_WAIT_TIME -> MAX_REWARD/REQUIRED_TIME -> MIN_REQUIRED_TIME)
+== (MIN_WAIT_TIME -> MAX_REWARD/REQUIRED_TIME -> MAX_REWARD)
 a_example: 10 in 0.008000 seconds
 b_should_be_easy: 179165 in 0.029000 seconds
 c_no_hurry: 13772080 in 3.084000 seconds
 d_metropolis: 11187915 in 3.243000 seconds
 e_high_bonus: 21511395 in 3.857000 seconds
 Totale: 46650565
+
+V2 (MIN_WAIT_TIME -> MIN_REQUIRED_TIME -> MAX_REWARD)
+a_example: 10 in 0.010000 seconds
+b_should_be_easy: 179747 in 0.023000 seconds
+c_no_hurry: 15057215 in 3.643000 seconds
+d_metropolis: 12509713 in 4.083000 seconds
+e_high_bonus: 21514649 in 4.002000 seconds
+Totale: 49261334
