@@ -1,5 +1,6 @@
 #include "choice_criteria.h"
 
+/////////////////////////////////////////////////// CHOICE CRITERIA VERSION 2 ///////////////////////////////////////////////////
 
 // Choice criterium to store the best ride in BEST: min_wait_time --> min_required_time
 void min_wt_min_rt(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int idv, int idr, int t)
@@ -165,5 +166,119 @@ void min_wt_min_rt_max_r(sample *SMP, int **DIST_S, couple **REW, mixtriple **BE
 		mixtriple mc = { .val = WAIT[idv][idr],.idr = idr ,.t = required_time };
 
 		BEST[idv][0] = mc;
+	}
+}
+
+
+
+/////////////////////////////////////////////////// CHOICE CRITERIA VERSION 1 ///////////////////////////////////////////////////
+
+// Stores the best rides according to the rewards
+void store_best_rewards(sample *SMP, int **DIST_S, mixcouple **BEST, couple **REW, int idv, int idr, int NB, int *slots, int t)
+{
+	// If the reward of assigning ride r to vehicle v is greater than the one in the current slot, update it with the greater one
+	if (REW[idv][idr].val > BEST[idv][0].val && t + DIST_S[idv][idr] + SMP->rides[idr].dd < SMP->T)
+	{
+		//couple ctemp = BEST[idv][i];
+		mixcouple mc = { .val = REW[idv][idr].val,.idr = REW[idv][idr].idr };
+
+		BEST[idv][0] = mc;
+
+		//assign_if_best(SMP, BEST, REW, idv, ctemp.idr, NB, slots);
+	}
+}
+
+
+
+// Stores the best rides according to the ratio reward/time_to_wait
+void store_best_rewards_time_to_wait(sample *SMP, int **DIST_S, couple **BEST, couple **REW, int idv, int idr, int NB, int *slots, int t)
+{
+	for (int i = 0; i < NB; i++)
+	{
+		// If the current slot is empty, assign the ride to it
+		if (BEST[idv][i].idr == -1)
+		{
+
+			BEST[idv][i] = REW[idv][idr];
+			slots--;
+			break;
+		}
+		// If the current slot is not empty
+		else
+		{
+			// If there is at least another empty slot, and the current slot is not empty, skip to the next slot
+			if (slots > 0)
+			{
+				continue;
+			}
+			// If there are no more empty slots in BEST[idv]
+			else
+			{
+				// If the reward of assigning ride r to vehicle v is greater than the one in the current slot, update it with the greater one
+				if (REW[idv][idr].val > BEST[idv][i].val && t + DIST_S[idv][idr] + SMP->rides[idr].dd < SMP->T)
+				{
+					//couple ctemp = BEST[idv][i];
+
+					BEST[idv][i] = REW[idv][idr];
+
+					//assign_if_best(SMP, BEST, REW, idv, ctemp.idr, NB, slots);
+				}
+			}
+		}
+	}
+}
+
+
+// Stores the best rides according to the ratio reward/required_time
+void store_best_rewards_required_time(sample *SMP, int **DIST_S, mixcouple **BEST, couple **REW, int idv, int idr, int NB, int *slots, int t)
+{
+
+	float wait_time = max(0, SMP->rides[idr].s - (t + DIST_S[idv][idr]));
+	float total_time = DIST_S[idv][idr] + SMP->rides[idr].dd + wait_time;
+	mixcouple mc = { .val = (float)REW[idv][idr].val / total_time,.idr = idr };
+
+	// If the reward of assigning ride r to vehicle v is greater than the one in the current slot, update it with the greater one
+	if (mc.val > BEST[idv][0].val && t + DIST_S[idv][idr] + SMP->rides[idr].dd < SMP->T)
+	{
+		//couple ctemp = BEST[idv][i];
+
+		BEST[idv][0] = mc;
+
+		//assign_if_best(SMP, BEST, REW, idv, ctemp.idr, NB, slots);
+	}
+}
+
+
+
+// Stores the best rides according to the distances from the vehicles to the rides
+void store_best_distances(sample *SMP, int **DIST_S, mixcouple **BEST, couple **REW, int idv, int idr, int NB, int *slots, int t)
+{
+	// If the reward of assigning ride r to vehicle v is greater than the one in the current slot, update it with the greater one
+	if (DIST_S[idv][idr] < BEST[idv][0].val && t + DIST_S[idv][idr] + SMP->rides[idr].dd < SMP->T)
+	{
+		//couple ctemp = BEST[idv][i];
+
+		mixcouple c = { .val = DIST_S[idv][idr],.idr = idr };
+
+		BEST[idv][0] = c;
+
+		//assign_if_best(SMP, BEST, REW, idv, ctemp.idr, NB, slots);
+	}
+}
+
+
+// Stores the best rides according to the distances from the vehicles to the rides
+void store_best_total_distances(sample *SMP, int **DIST_S, mixcouple **BEST, couple **REW, int idv, int idr, int NB, int *slots, int t)
+{
+	// If the reward of assigning ride r to vehicle v is greater than the one in the current slot, update it with the greater one
+	if (DIST_S[idv][idr] + SMP->rides[idr].dd < BEST[idv][0].val && t + DIST_S[idv][idr] + SMP->rides[idr].dd < SMP->T)
+	{
+		//couple ctemp = BEST[idv][i];
+
+		mixcouple c = { .val = DIST_S[idv][idr] + SMP->rides[idr].dd,.idr = idr };
+
+		BEST[idv][0] = c;
+
+		//assign_if_best(SMP, BEST, REW, idv, ctemp.idr, NB, slots);
 	}
 }

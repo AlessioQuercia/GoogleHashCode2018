@@ -98,9 +98,6 @@ void load_data(char *data_file, sample *SMP);
 // Splits the string
 void split_str(char *string, char *delim, int *split_string);
 
-// Computes and returns the distance between beginning intersection [a,b] and destination intersection [x,y]
-int distance(int a, int b, int x, int y);
-
 // Stores the output in the file data_file
 void store_output(char *data_file, sample *SMP);
 

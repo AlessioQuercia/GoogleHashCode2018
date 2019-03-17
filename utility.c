@@ -1,4 +1,5 @@
 #include "utility.h"
+#include "heuristics.h"
 
 void load_data(char *data_file, sample *SMP)
 {
