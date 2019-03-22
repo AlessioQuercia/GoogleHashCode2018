@@ -77,3 +77,29 @@ c_no_hurry: 15057215 in 3.643000 seconds
 d_metropolis: 12509713 in 4.083000 seconds
 e_high_bonus: 21514649 in 4.002000 seconds
 Totale: 49261334
+
+
+V3 (MIN_WAIT_TIME -> MIN_REQUIRED_TIME -> MAX_REWARD)
+a_example: 10 in 0.010000 seconds
+b_should_be_easy: 171377 in 0.020000 seconds
+c_no_hurry: 15080688 in 3.793000 seconds
+d_metropolis: 11391232 in 4.339000 seconds
+e_high_bonus: 11821945 in 4.007000 seconds
+Totale: 38465252
+
+
+V3 (MAX_UTILITY)
+a_example: 10 in  0.026000 seconds
+b_should_be_easy: 172752 in 0.044000 seconds
+c_no_hurry: 15818350 in 3.485000 seconds
+d_metropolis: 11245657 in 3.840000 seconds
+e_high_bonus: 20607945 in 3.928000 seconds
+Totale: 47844714
+
+V3 (MAX_UTILITY --> MIN_REQUIRED_TIME)
+a_example: 10 in  0.005000 seconds
+b_should_be_easy: 172752 in 0.016000 seconds
+c_no_hurry: 15809027 in 3.785000 seconds
+d_metropolis: 11281285 in 4.053000 seconds
+e_high_bonus: 20646945 in 4.053000 seconds
+Totale: 47910019

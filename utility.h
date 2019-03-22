@@ -35,6 +35,7 @@ typedef struct vehicle_s
 	int id;   // vehicle id (0 <= id < F)
 	int nrd;	  // number of rides already done
 	int *idrd;  // id of the rides already done
+	int t;		// current time already used
 } vehicle;
 
 
@@ -101,8 +102,19 @@ void split_str(char *string, char *delim, int *split_string);
 // Stores the output in the file data_file
 void store_output(char *data_file, sample *SMP);
 
+// Stores the output in the file data_file
+void store_output_v3(char *data_file, sample *SMP);
+
 // Computes the score, given an output file with the required format
 void compute_score(char *output_file, sample *SMP);
+
+// Computes the score, given an output file with the required format
+void compute_score_v2(char *output_file, sample *SMP);
+
+// Computes the score, given an output file with the required format
+int compute_score_v3(char *output_file, sample *SMP);
+
+void freeMemory(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int NB);
 
 
 // Prints the data inside the sample SMP

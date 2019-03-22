@@ -27,6 +27,29 @@ int reward(vehicle v, ride r, int dist, int t, int T, int B)
 }
 
 
+// Returns the reward given by assigning the ride r to the vehicle v at time t
+int reward_v3(sample *SMP, int **DIST_S, vehicle v, ride r, int dist, int t)
+{
+	int rew = 0;
+
+	int tds = t + dist;
+
+	// If the vehicle will arrive in time (or earlier) at the starting point, starting from the time t, bonus B will be added
+	if (tds <= r.s)
+		rew += SMP->B;
+
+	int wt = wait_time(SMP, DIST_S, v.id, r.id, t);
+
+	int required_time = tds + wt + r.dd;
+
+	// If the vehicle will arrive at destination before the end T, points proportional to the distance (r.dd) will be added
+	if (required_time <= r.f && required_time <= SMP->T)
+		rew += r.dd;
+
+	return rew;
+}
+
+
 // Returns the wait_time for the couple (vehicle, ride)
 int wait_time(sample *SMP, int **DIST_S, int idv, int idr, int t)
 {
@@ -35,26 +58,27 @@ int wait_time(sample *SMP, int **DIST_S, int idv, int idr, int t)
 
 
 // Returns the variance of an element
-float variance_reward(sample *SMP, couple **REW, int idv, int idr)
+float variance_reward(sample *SMP, int **REW, int idv, int idr)
 {
 	float avg = 0;
 	for (int i = 0; i < SMP->N; i++)
 	{
-		avg += REW[idv][i].val;
+		avg += REW[idv][i];
 	}
 	avg = avg / SMP->N;
 
-	return (float)(pow(REW[idv][idr].val - avg, 2));
+	return (float)(pow(REW[idv][idr] - avg, 2));
 }
 
 
 // Returns the variance of an element
-float variance_required_time(sample *SMP, couple **REW, int **DIST_S, int **WAIT, int idv, int t, int required_time)
+float variance_required_time(sample *SMP, int **REW, int **DIST_S, int **WAIT, int idv, int t, int required_time)
 {
 	float avg = 0;
 	for (int i = 0; i < SMP->N; i++)
 	{
-		avg += t + DIST_S[idv][i] + WAIT[idv][i] + SMP->rides[i].dd;
+		int wt = wait_time(SMP, DIST_S, idv, i, t);
+		avg += t + DIST_S[idv][i] + wt + SMP->rides[i].dd;
 	}
 	avg = avg / SMP->N;
 
@@ -62,11 +86,31 @@ float variance_required_time(sample *SMP, couple **REW, int **DIST_S, int **WAIT
 }
 
 
+float avg_distance(sample *SMP, int xs, int ys)
+{
+	float x = 0;
+	float y = 0;
+
+	for (int j = 0; j < SMP->N; j++)
+	{
+		x += SMP->rides[j].a;
+		y += SMP->rides[j].b;
+	}
+
+	x = x / SMP->N;
+	y = y / SMP->N;
+
+	float avg_dist = abs(xs - x) + abs(ys - y);
+
+	return avg_dist;
+}
+
+
 
 /////////////////////////////////////////////////// VERSION 2 ///////////////////////////////////////////////////
 
 // Starts a simulation with wait times
-void start_simulation_v2(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int NB, int *slots)
+void start_simulation_v2(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int NB, int *slots, int iter, int q)
 {
 	printf("SIMULATION V2 STARTED\n");
 
@@ -75,63 +119,107 @@ void start_simulation_v2(sample *SMP, int **DIST_S, couple **REW, mixtriple **BE
 	{
 		int t = 0;	// Current vehicle step
 
-		update_rides(SMP, DIST_S, REW, BEST, WAIT, i, t);	// Update vehicle possible rides
+		update_rides(SMP, DIST_S, REW, BEST, i, t, 0, NB);	// Update vehicle possible rides
 
 		//printf("VEHICLE %d:\n", i);
 
-		while ((t += assign_ride(SMP, DIST_S, REW, BEST, WAIT, i, t)) <= SMP->T)	// Assign a new ride (if possible) and increment the current step by the required_time of the assigned ride
+		// While it's possible, assign a new ride and increment the current step by the required_time of the assigned ride
+		while ((t += assign_ride(SMP, DIST_S, REW, BEST, i, t, iter, q, NB)) <= SMP->T)	
 		{
 
 			// Move to the assigned ride destination
-			move(SMP, i);
+			move(SMP, i, t);
 
 			// Update vehicle possible rides
-			update_rides(SMP, DIST_S, REW, BEST, WAIT, i, t);
+			update_rides(SMP, DIST_S, REW, BEST, i, t, 0, NB);
 		}
 	}
+
+	//// For each vehicle
+	//for (int i = 0; i < SMP->F; i++)
+	//{
+	//	int t = SMP->vehicles[i].t;	// Current vehicle step
+
+	//	if (t > SMP->T)
+	//		continue;
+
+	//	update_rides(SMP, DIST_S, REW, BEST, WAIT, i, t, 1);	// Update vehicle possible rides
+
+	//	//printf("VEHICLE %d:\n", i);
+
+	//	while ((t += assign_ride(SMP, DIST_S, REW, BEST, WAIT, i, t)) <= SMP->T)	// Assign a new ride (if possible) and increment the current step by the required_time of the assigned ride
+	//	{
+
+	//		// Move to the assigned ride destination
+	//		move(SMP, i, t);
+
+	//		// Update vehicle possible rides
+	//		update_rides(SMP, DIST_S, REW, BEST, WAIT, i, t, 1);
+	//	}
+	//}
 
 	printf("SIMULATION V2 ENDED\n");
 }
 
 // Assigns a ride according to a choice_criterium and returns the time required to complete the ride
-int assign_ride(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int idv, int t)
+int assign_ride(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int idv, int t, int iter, int q, int K)
 {
 	int required_time = INT_MAX - t;
+	int idr = BEST[idv][0].idr;
 
-	// If the *best* ride (according to a choice_criterium) is not done yet, assign it
-	if (SMP->rides[BEST[idv][0].idr].done == 0)
+	// If it's not the first time running the algorithm, add randomness to the choice criterium
+	if (iter > 0 && SMP->N > 3)
 	{
-		SMP->rides[BEST[idv][0].idr].done = 1;
-		SMP->vehicles[idv].ride = SMP->rides[BEST[idv][0].idr];
-		SMP->vehicles[idv].ds = DIST_S[idv][BEST[idv][0].idr];
+		double r = (double)rand() / (double)RAND_MAX;
+		double index = pow(r, q) * (K-1);
+		int i = round(index);
+		idr = BEST[idv][i].idr;
 
-		int wait_t = wait_time(SMP, DIST_S, idv, SMP->vehicles[idv].ride.id, t);	// max( 0, earliest_start - (current_t + distance_vechicle_ride) )
-
-		required_time = SMP->vehicles[idv].ds + wait_t + SMP->vehicles[idv].ride.dd;	// distance_vechicle_ride + wait_time + distance_ride_destination
+		//printf("%d vs %d\n", BEST[idv][i].idr, BEST[idv][0].idr);
 	}
 
-	//printf("BEST IDR: %d\n", BEST[idv][0].idr);
+	// If the *best* (or random among the best ones) ride (according to a choice_criterium) is not done yet, assign it
+	if (idr >= 0 && SMP->rides[idr].done == 0)
+	{
+		SMP->rides[idr].done = 1;
+		SMP->vehicles[idv].ride = SMP->rides[idr];
+		SMP->vehicles[idv].ds = DIST_S[idv][idr];
+
+		//printf("%d vs %d\n", idr, BEST[idv][0].idr);
+
+		int wait_t = wait_time(SMP, DIST_S, idv, idr, t);  //wait_time(SMP, DIST_S, idv, SMP->vehicles[idv].ride.id, t);	// max( 0, earliest_start - (current_t + distance_vechicle_ride) )
+
+		required_time = SMP->vehicles[idv].ds + wait_t + SMP->vehicles[idv].ride.dd;	// distance_vechicle_ride + wait_time + distance_ride_destination
+
+		//printf("VEHICLE %d, RIDE %d, T %d, DS %d, WT %d, DSWT %d, DD %d, RT %d, F %d\n\n", idv, BEST[idv][0].idr, t, SMP->vehicles[idv].ds, wait_t, SMP->vehicles[idv].ds + wait_t,
+		//	SMP->vehicles[idv].ride.dd, t + required_time, SMP->vehicles[idv].ride.f);
+
+	}
 
 	return required_time;
 }
 
 // Makes an entire ride
-void move(sample *SMP, int idv)
+void move(sample *SMP, int idv, int t)
 {
-	SMP->vehicles[idv].r = SMP->vehicles[idv].ride.a;
-	SMP->vehicles[idv].c = SMP->vehicles[idv].ride.b;
+	SMP->vehicles[idv].r = SMP->vehicles[idv].ride.x;
+	SMP->vehicles[idv].c = SMP->vehicles[idv].ride.y;
+	SMP->vehicles[idv].idrd[SMP->vehicles[idv].nrd] = SMP->vehicles[idv].ride.id;
 	SMP->vehicles[idv].nrd++;
-	SMP->vehicles[idv].idrd[SMP->vehicles[idv].ride.id] = 1;
+	SMP->vehicles[idv].t = t;
+	//SMP->vehicles[idv].idrd[SMP->vehicles[idv].ride.id] = 1;
 }
 
 
-void update_rides(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int idv, int t)
+
+void update_rides(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int idv, int t, int crit, int K)
 {
 	// Re-initialize BEST
-	mixtriple mc = { .val = INT_MAX,.idr = -1,.t = INT_MAX };	// mixtriple
+	initialize_best_v2v(BEST, SMP->F, K, idv);
+	//mixtriple mc = { .val = INT_MIN,.idr = -1,.t = INT_MAX };	// mixtriple
 	//mixquad mc = { .val = INT_MAX,.idr = -1, .t = INT_MAX, .rt = INT_MIN };	// mixquad
 
-	BEST[idv][0] = mc;
+	//BEST[idv][0] = mc;
 
 	// For each ride
 	for (int i = 0; i < SMP->N; i++)
@@ -142,19 +230,19 @@ void update_rides(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int
 		// Compute the distance from the vehicle current position to the considered ride
 		DIST_S[idv][i] = distance(SMP->vehicles[idv].r, SMP->vehicles[idv].c, SMP->rides[i].a, SMP->rides[i].b);
 
-		// Compute the wait_time for the considered ride
-		WAIT[idv][i] = wait_time(SMP, DIST_S, idv, i, t);
+		//// Compute the wait_time for the considered ride
+		//WAIT[idv][i] = wait_time(SMP, DIST_S, idv, i, t);
 
 		// Compute the reward for the considered ride
-		int rwrd = reward(SMP->vehicles[idv], SMP->rides[i], DIST_S[idv][i], t, SMP->T, SMP->B);
+		int rwrd = reward_v3(SMP, DIST_S, SMP->vehicles[idv], SMP->rides[i], DIST_S[idv][i], t);
 
-		couple c = { .val = rwrd,.idr = SMP->rides[i].id };
-
-		REW[idv][i] = c;
-
+		REW[idv][i] = rwrd;
+		
 		// Choice criterium to store the best ride in BEST
-		//min_wait_time(SMP, DIST_S, REW, BEST, WAIT, idv, i, t);	// BEST mixtriple
-		min_wt_min_rt_max_r(SMP, DIST_S, REW, BEST, WAIT, idv, i, t);	// BEST mixquad
+		if (crit == 0)
+			max_u_min_rt_K(SMP, DIST_S, REW, BEST, idv, i, t, K-1);
+		//else
+		//	min_rt_max_r(SMP, DIST_S, REW, BEST, WAIT, idv, i, t);
 	}
 
 	//printf("%f, %d, %d\n", BEST[idv][0].val, BEST[idv][0].idr, BEST[idv][0].t);
@@ -162,47 +250,64 @@ void update_rides(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int
 
 
 // Initializes the required structures for v2
-void initialize_structures(sample *SMP, int **DIST_S, mixtriple **BEST, couple **REW, int **WAIT, int t)
+void initialize_structures(sample *SMP, int **DIST_S, mixtriple **BEST, int **REW, int t, int crit, int K)
 {
 	printf("INITIALIZING STRUCTURES\n");
 	for (int i = 0; i < SMP->F; i++)
 	{
 		for (int j = 0; j < SMP->N; j++)
 		{
+			if (SMP->rides[i].done == 1)
+				continue;
+
+			if (DIST_S[i] == NULL) printf("CIAO1");
+			if (REW[i] == NULL) printf("CIAO2");
+
 			DIST_S[i][j] = distance(SMP->vehicles[i].r, SMP->vehicles[i].c, SMP->rides[j].a, SMP->rides[j].b);	// Initialze distances from vehicles to rides
 
-			WAIT[i][j] = wait_time(SMP, DIST_S, i, j, t);	// Initialize wait_times
+			//WAIT[i][j] = wait_time(SMP, DIST_S, i, j, t);	// Initialize wait_times
 
-			int rwrd = reward(SMP->vehicles[i], SMP->rides[j], DIST_S[i][j], t, SMP->T, SMP->B);
+			int rwrd = reward_v3(SMP, DIST_S, SMP->vehicles[i], SMP->rides[j], DIST_S[i][j], t);
 
-			couple c = { .val = rwrd,.idr = SMP->rides[j].id };
-
-			REW[i][j] = c;	// Initialize rewards
+			REW[i][j] = rwrd;	// Initialize rewards
 
 			// Choice criterium to store the best ride in BEST
-			//min_wait_time(SMP, DIST_S, REW, BEST, WAIT, i, j, t);		// BEST mixtriple
-			min_wt_min_rt_max_r(SMP, DIST_S, REW, BEST, WAIT, i, j, t);	// BEST mixquad
+		// Choice criterium to store the best ride in BEST
+			if (crit == 0)
+				max_u_min_rt_K(SMP, DIST_S, REW, BEST, i, j, t, K-1);
+			//else
+			//	min_rt_max_r(SMP, DIST_S, REW, BEST, WAIT, i, j, t);
 		}
 	}
 }
 
 
-// Initializes the distances from the vehicles to the starting points
+// Initializes the values in BEST for each couple of vehicle and ride
 void initialize_best_v2(mixtriple **BEST, int F, int NB)
 {
-	printf("INITIALIZING BEST\n");
+	//printf("INITIALIZING BEST\n");
 	for (int i = 0; i < F; i++)
 	{
 		for (int j = 0; j < NB; j++)
 		{
-			mixtriple c = { .val = INT_MAX,.idr = -1,.t = INT_MAX };	// mixtriple
+			mixtriple c = { .val = INT_MIN,.idr = -1,.t = INT_MAX };	// mixtriple
 			//mixquad c = { .val = INT_MAX,.idr = -1,.t = INT_MAX, .rt = INT_MIN };	// mixquad
 			BEST[i][j] = c;
 		}
 	}
 }
 
-
+// Initializes the values in BEST for each ride of a given vehicle v
+void initialize_best_v2v(mixtriple **BEST, int F, int NB, int idv)
+{
+	//printf("INITIALIZING BEST\n");
+	for (int j = 0; j < NB; j++)
+	{
+		mixtriple c = { .val = INT_MIN,.idr = -1,.t = INT_MAX };	// mixtriple
+		//mixquad c = { .val = INT_MAX,.idr = -1,.t = INT_MAX, .rt = INT_MIN };	// mixquad
+		BEST[idv][j] = c;
+	}
+}
 
 
 /////////////////////////////////////////////////// VERSION 1 ///////////////////////////////////////////////////
