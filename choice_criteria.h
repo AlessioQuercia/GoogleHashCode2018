@@ -7,7 +7,7 @@
 /////////////////////////////////////////////////// CHOICE CRITERIA VERSION 2 ///////////////////////////////////////////////////
 
 // Choice criterium to store the best ride in BEST: max_reward
-void max_r(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int idv, int idr, int t);
+void max_r(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int idv, int idr, int t);
 
 // Choice criterium to store the best ride in BEST: min_required_time --> max_reward
 void min_rt_max_r(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int idv, int idr, int t);
@@ -34,7 +34,7 @@ void min_wt_max_r_max_ratio(sample *SMP, int **DIST_S, couple **REW, mixquad **B
 void min_wt_min_rt_max_ratio(sample *SMP, int **DIST_S, couple **REW, mixquad **BEST, int **WAIT, int idv, int idr, int t);
 
 // Choice criterium to store the best ride in BEST: min_wait_time --> min_required_time --> max_reward
-void min_wt_min_rt_max_r(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int idv, int idr, int t);
+void min_wt_min_rt_max_r(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int idv, int idr, int t);
 
 // Choice criterium to store the best ride in BEST: zero_wait_time --> min_required_time --> max_reward
 void zero_wt_min_rt_max_r(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int idv, int idr, int t);
@@ -47,6 +47,12 @@ void max_u_min_rt(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int id
 
 // Choice criterium to store the best K rides in BEST: max_utility --> min_required_time
 void max_u_min_rt_K(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int idv, int idr, int t, int K);
+
+// Choice criterium to store the best ride in BEST: min_wait_time --> min_required_time --> max_reward
+void min_wt_min_rt_max_r_K(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int idv, int idr, int t, int K);
+
+// Choice criterium to store the best ride in BEST: max_reward
+void max_r_K(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int idv, int idr, int t, int K);
 
 
 /////////////////////////////////////////////////// CHOICE CRITERIA VERSION 1 ///////////////////////////////////////////////////

@@ -28,11 +28,11 @@ int reward(vehicle v, ride r, int dist, int t, int T, int B)
 
 
 // Returns the reward given by assigning the ride r to the vehicle v at time t
-int reward_v3(sample *SMP, int **DIST_S, vehicle v, ride r, int dist, int t)
+int reward_v3(sample *SMP, int **DIST_S, vehicle v, ride r, int t)
 {
 	int rew = 0;
 
-	int tds = t + dist;
+	int tds = t + DIST_S[v.id][r.id];
 
 	// If the vehicle will arrive in time (or earlier) at the starting point, starting from the time t, bonus B will be added
 	if (tds <= r.s)
@@ -110,7 +110,7 @@ float avg_distance(sample *SMP, int xs, int ys)
 /////////////////////////////////////////////////// VERSION 2 ///////////////////////////////////////////////////
 
 // Starts a simulation with wait times
-void start_simulation_v2(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int NB, int *slots, int iter, int q)
+void start_simulation_v2(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int NB, int *slots, int iter, int crit, int q)
 {
 	printf("SIMULATION V2 STARTED\n");
 
@@ -119,7 +119,21 @@ void start_simulation_v2(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST,
 	{
 		int t = 0;	// Current vehicle step
 
-		update_rides(SMP, DIST_S, REW, BEST, i, t, 0, NB);	// Update vehicle possible rides
+		//int crit = 0;
+
+		//if (iter > 0)
+		//{
+		//	double r = (double)rand() / (double)RAND_MAX;
+
+		//	if (r >= 0.3)
+		//		crit = 0;
+		//	else if (r >= 0.15 && r < 0.3)
+		//		crit = 1;
+		//	else if (r < 0.15) 
+		//		crit = 2;
+		//}
+
+		update_rides(SMP, DIST_S, REW, BEST, i, t, crit, NB);	// Update vehicle possible rides
 
 		//printf("VEHICLE %d:\n", i);
 
@@ -130,8 +144,20 @@ void start_simulation_v2(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST,
 			// Move to the assigned ride destination
 			move(SMP, i, t);
 
+			//if (iter > 0)
+			//{
+			//	double r = (double)rand() / (double)RAND_MAX;
+
+			//	if (r >= 0.3)
+			//		crit = 0;
+			//	else if (r >= 0.15 && r < 0.3)
+			//		crit = 1;
+			//	else if (r < 0.15)
+			//		crit = 2;
+			//}
+
 			// Update vehicle possible rides
-			update_rides(SMP, DIST_S, REW, BEST, i, t, 0, NB);
+			update_rides(SMP, DIST_S, REW, BEST, i, t, crit, NB);
 		}
 	}
 
@@ -214,8 +240,30 @@ void move(sample *SMP, int idv, int t)
 
 void update_rides(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int idv, int t, int crit, int K)
 {
-	// Re-initialize BEST
-	initialize_best_v2v(BEST, SMP->F, K, idv);
+
+	//// Re-initialize BEST
+	//initialize_best_v2v_min_max(BEST, SMP->F, K, idv);
+
+	// ADD RANDOMNESS TO THE CHOICE OF THE CHOICE CRITERIUM
+	//double r = (double)rand() / (double)RAND_MAX;
+
+	if (crit == 0)
+	{
+		// Re-initialize BEST
+		initialize_best_v2v_min_max(BEST, SMP->F, K, idv);
+	}
+	else if (crit == 1)
+	{
+		// Re-initialize BEST
+		initialize_best_v2v_max_max(BEST, SMP->F, K, idv);
+	}
+	else if (crit == 2)
+	{
+		// Re-initialize BEST
+		initialize_best_v2v_min_max(BEST, SMP->F, K, idv);
+	}
+
+
 	//mixtriple mc = { .val = INT_MIN,.idr = -1,.t = INT_MAX };	// mixtriple
 	//mixquad mc = { .val = INT_MAX,.idr = -1, .t = INT_MAX, .rt = INT_MIN };	// mixquad
 
@@ -234,13 +282,35 @@ void update_rides(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int id
 		//WAIT[idv][i] = wait_time(SMP, DIST_S, idv, i, t);
 
 		// Compute the reward for the considered ride
-		int rwrd = reward_v3(SMP, DIST_S, SMP->vehicles[idv], SMP->rides[i], DIST_S[idv][i], t);
+		int rwrd = reward_v3(SMP, DIST_S, SMP->vehicles[idv], SMP->rides[i], t);
 
 		REW[idv][i] = rwrd;
+
+
+		//// K best max_u_min_rt
+		//max_u_min_rt_K(SMP, DIST_S, REW, BEST, idv, i, t, K - 1);
 		
+
+		// ADD RANDOMNESS TO THE CHOICE OF THE CHOICE CRITERIUM
 		// Choice criterium to store the best ride in BEST
 		if (crit == 0)
-			max_u_min_rt_K(SMP, DIST_S, REW, BEST, idv, i, t, K-1);
+		{
+			// K best max_u_min_rt
+			max_u_min_rt_K(SMP, DIST_S, REW, BEST, idv, i, t, K - 1);
+			//printf("MAX_U\n");
+		}
+		else if (crit == 1)
+		{
+			// K best min_wt_min_rt_max_r
+			min_wt_min_rt_max_r_K(SMP, DIST_S, REW, BEST, idv, i, t, K - 1);
+		}
+		else if (crit == 2)
+		{
+			// K best max_r
+			max_r_K(SMP, DIST_S, REW, BEST, idv, i, t, K - 1);
+		}
+		//if (crit == 0)
+		//	max_u_min_rt_K(SMP, DIST_S, REW, BEST, idv, i, t, K-1);
 		//else
 		//	min_rt_max_r(SMP, DIST_S, REW, BEST, WAIT, idv, i, t);
 	}
@@ -253,28 +323,51 @@ void update_rides(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int id
 void initialize_structures(sample *SMP, int **DIST_S, mixtriple **BEST, int **REW, int t, int crit, int K)
 {
 	printf("INITIALIZING STRUCTURES\n");
+
 	for (int i = 0; i < SMP->F; i++)
 	{
+		/*double r = (double)rand() / (double)RAND_MAX;*/
+
 		for (int j = 0; j < SMP->N; j++)
 		{
 			if (SMP->rides[i].done == 1)
 				continue;
 
-			if (DIST_S[i] == NULL) printf("CIAO1");
-			if (REW[i] == NULL) printf("CIAO2");
+			//if (DIST_S[i] == NULL) printf("CIAO1");
+			//if (REW[i] == NULL) printf("CIAO2");
 
 			DIST_S[i][j] = distance(SMP->vehicles[i].r, SMP->vehicles[i].c, SMP->rides[j].a, SMP->rides[j].b);	// Initialze distances from vehicles to rides
 
 			//WAIT[i][j] = wait_time(SMP, DIST_S, i, j, t);	// Initialize wait_times
 
-			int rwrd = reward_v3(SMP, DIST_S, SMP->vehicles[i], SMP->rides[j], DIST_S[i][j], t);
+			int rwrd = reward_v3(SMP, DIST_S, SMP->vehicles[i], SMP->rides[j], t);
 
 			REW[i][j] = rwrd;	// Initialize rewards
 
+
+			//// K best max_u_min_rt
+			//max_u_min_rt_K(SMP, DIST_S, REW, BEST, i, j, t, K - 1);
+
+			// ADD RANDOMNESS TO THE CHOICE OF THE CHOICE CRITERIUM
 			// Choice criterium to store the best ride in BEST
-		// Choice criterium to store the best ride in BEST
 			if (crit == 0)
-				max_u_min_rt_K(SMP, DIST_S, REW, BEST, i, j, t, K-1);
+			{
+				// K best max_u_min_rt
+				max_u_min_rt_K(SMP, DIST_S, REW, BEST, i, j, t, K - 1);
+			}
+			else if (crit == 1)
+			{
+				// K best min_wt_min_rt_max_r
+				min_wt_min_rt_max_r_K(SMP, DIST_S, REW, BEST, i, j, t, K - 1);
+			}
+			else if (crit == 2)
+			{
+				// K best max_r
+				max_r_K(SMP, DIST_S, REW, BEST, i, j, t, K - 1);
+			}
+		// Choice criterium to store the best ride in BEST
+			//if (crit == 0)
+			//	max_u_min_rt_K(SMP, DIST_S, REW, BEST, i, j, t, K-1);
 			//else
 			//	min_rt_max_r(SMP, DIST_S, REW, BEST, WAIT, i, j, t);
 		}
@@ -283,27 +376,62 @@ void initialize_structures(sample *SMP, int **DIST_S, mixtriple **BEST, int **RE
 
 
 // Initializes the values in BEST for each couple of vehicle and ride
-void initialize_best_v2(mixtriple **BEST, int F, int NB)
+void initialize_best_v2(sample *SMP, mixtriple **BEST, int F, int NB, int crit)
 {
 	//printf("INITIALIZING BEST\n");
 	for (int i = 0; i < F; i++)
 	{
-		for (int j = 0; j < NB; j++)
+		//// Re-initialize BEST
+		//initialize_best_v2v_min_max(BEST, SMP->F, NB, i);
+
+
+		// ADD RANDOMNESS TO THE CHOICE OF THE CHOICE CRITERIUM
+		//double r = (double)rand() / (double)RAND_MAX;
+
+		if (crit == 0)
 		{
-			mixtriple c = { .val = INT_MIN,.idr = -1,.t = INT_MAX };	// mixtriple
-			//mixquad c = { .val = INT_MAX,.idr = -1,.t = INT_MAX, .rt = INT_MIN };	// mixquad
-			BEST[i][j] = c;
+			// Re-initialize BEST
+			initialize_best_v2v_min_max(BEST, SMP->F, NB, i);
 		}
+		else if (crit == 1)
+		{
+			// Re-initialize BEST
+			initialize_best_v2v_max_max(BEST, SMP->F, NB, i);
+		}
+		else if (crit == 2)
+		{
+			// Re-initialize BEST
+			initialize_best_v2v_min_max(BEST, SMP->F, NB, i);
+		}
+
+		//for (int j = 0; j < NB; j++)
+		//{
+		//	mixtriple c = { .val = INT_MIN,.idr = -1,.t = INT_MAX };	// mixtriple
+		//	//mixquad c = { .val = INT_MAX,.idr = -1,.t = INT_MAX, .rt = INT_MIN };	// mixquad
+		//	BEST[i][j] = c;
+		//}
 	}
 }
 
 // Initializes the values in BEST for each ride of a given vehicle v
-void initialize_best_v2v(mixtriple **BEST, int F, int NB, int idv)
+void initialize_best_v2v_min_max(mixtriple **BEST, int F, int NB, int idv)
 {
 	//printf("INITIALIZING BEST\n");
 	for (int j = 0; j < NB; j++)
 	{
 		mixtriple c = { .val = INT_MIN,.idr = -1,.t = INT_MAX };	// mixtriple
+		//mixquad c = { .val = INT_MAX,.idr = -1,.t = INT_MAX, .rt = INT_MIN };	// mixquad
+		BEST[idv][j] = c;
+	}
+}
+
+// Initializes the values in BEST for each ride of a given vehicle v
+void initialize_best_v2v_max_max(mixtriple **BEST, int F, int NB, int idv)
+{
+	//printf("INITIALIZING BEST\n");
+	for (int j = 0; j < NB; j++)
+	{
+		mixtriple c = { .val = -1,.idr = -1,.t = INT_MAX };	// mixtriple
 		//mixquad c = { .val = INT_MAX,.idr = -1,.t = INT_MAX, .rt = INT_MIN };	// mixquad
 		BEST[idv][j] = c;
 	}

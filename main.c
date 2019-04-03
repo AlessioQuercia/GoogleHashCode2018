@@ -3,9 +3,10 @@
 
 void main()
 {
+	// LOADING THE SAMPLES ONCE
 	int nsamples = 5;
 	char *inputs[] = { "data/a_example.in", "data/b_should_be_easy.in", "data/c_no_hurry.in", "data/d_metropolis.in", "data/e_high_bonus.in" };
-	char *outputs[] = { "data/a_example.out", "data/b_should_be_easy.out", "data/c_no_hurry.out", "data/d_metropolis.out", "data/e_high_bonus.out" };
+	char *outputs[] = { "data/a_example", "data/b_should_be_easy", "data/c_no_hurry", "data/d_metropolis", "data/e_high_bonus" };
 
 	sample SMPs[nsamples];
 
@@ -16,15 +17,17 @@ void main()
 		free(input);
 	}
 
-
+	// INITIALIZING VARIABLES
 	int times = 100;
 	clock_t very_total_time = clock();
 	int best_total_score = 0;
-	int q = 2;
+	int q = 100;
 
+	// INITIALIZING RANDOM SEED
 	int seed = time(NULL);
 	srand(seed);
 
+	// REPEAT THE ALGORITHM times TIMES
 	for (int h = 0; h < times; h++)
 	{
 		clock_t total_time = clock();
@@ -35,12 +38,13 @@ void main()
 		int **REW;
 		mixtriple **BEST;
 
-
+		// FOR EACH SAMPLE
 		for (int z = 0; z < nsamples; z++)
 		{
 			clock_t sample_time = clock();
 			int sample_score = 0;
 
+			// RE-iNITIALIZE THE SAMPLE VARIABLES
 			for (int i = 0; i < SMPs[z].F; i++)
 			{
 				SMPs[z].vehicles[i].nrd = 0;
@@ -74,10 +78,14 @@ void main()
 			//char output[] = "data/e_high_bonus.out";
 
 			//char *input = inputs[z];
-			char *output = outputs[z];
+			char *str = outputs[z];
+
+			char output[100];
+			sprintf(output, "%s%d.out", str, h);
 
 			//load_data(input, &SMP);		// Loads the sample
 
+			// INSTANTIATE THE DISTANCES MATRIX
 			DIST_S = calloc(SMPs[z].F, sizeof(int *));		// Distances from the vehicles to the starting points
 
 			for (int i = 0; i < SMPs[z].F; i++)
@@ -92,16 +100,18 @@ void main()
 			//	WAIT[i] = calloc(SMP.N, sizeof(int));
 			//}
 
+			// K + 1
 			int NB = 11;		// Number of best rides to select for each vehicle (B <= F <= N)
 							// 1 for the best ride for each vehicle
 
+			// INSTANTIATE THE REWARDS MATRIX
 			int **REW = calloc(SMPs[z].F, sizeof(int *));		// Best rides for each vehicleehic
 
 			for (int i = 0; i < SMPs[z].F; i++)
 			{
 				REW[i] = calloc(SMPs[z].N, sizeof(int));
-				if (REW[i] == NULL)
-					printf("AAAAAAAAAAAAAAAAAAAAAAAAA\n");
+				//if (REW[i] == NULL)
+				//	printf("AAAAAAAAAAAAAAAAAAAAAAAAA\n");
 			}
 
 			int slots = NB;
@@ -128,6 +138,8 @@ void main()
 			//start_simulation(&SMP, DIST_S, REW, BEST, NB, pslots);	// Start the simulation
 
 			// V2
+
+			// INSTANTIATE BESTS MATRIX
 			// mixtriple
 			mixtriple **BEST = calloc(SMPs[z].F, sizeof(mixtriple *));		// Best rides for each vehicle
 
@@ -144,32 +156,56 @@ void main()
 			//	BEST[i] = calloc(NB, sizeof(mixquad));
 			//}
 
-			initialize_best_v2(BEST, SMPs[z].F, NB);		// Initializes BEST
+			// CHOOSE THE CRITERIUM TO USE
+			int crit = 0;
 
-			initialize_structures(&SMPs[z], DIST_S, BEST, REW, 0, 0, NB); // Initialize the required structures
+			//if (h > 0)
+			//{
+			//	double r = (double)rand() / (double)RAND_MAX;
 
-			start_simulation_v2(&SMPs[z], DIST_S, REW, BEST, NB, pslots, h, q);	// Start the simulation (with wait times)
+			//	if (r >= 0.3)
+			//		crit = 0;
+			//	else if (r >= 0.15 && r < 0.3)
+			//		crit = 1;
+			//	else if (r < 0.15)
+			//		crit = 2;
+			//}
+
+			// INITIALIZE BESTS MATRIX
+			initialize_best_v2(&SMPs[z], BEST, SMPs[z].F, NB, crit);		// Initializes BEST
+
+			// INITIALIZE THE OTHER STRUCTURES
+			initialize_structures(&SMPs[z], DIST_S, BEST, REW, 0, crit, NB); // Initialize the required structures
+
+			// START THE SIMULATION
+			start_simulation_v2(&SMPs[z], DIST_S, REW, BEST, NB, pslots, h, crit, q);	// Start the simulation (with wait times)
 
 
 			// STORE + SCORE
 
+			// STORE THE OUTPUT
 			store_output_v3(output, &SMPs[z]);		// Stores the output
 
+			// COMPUTE THE SCORE
 			sample_score = compute_score_v3(output, &SMPs[z]);	// Computes the total score
 
+			// COMPUTE THE SAMPLE EXECUTION TIME
 			sample_time = clock() - sample_time;
 
+			// UPDATE THE TOTAL SCORE
 			total_score += sample_score;
 
 			double cpu_sample_time_used = ((double)sample_time) / CLOCKS_PER_SEC;
 
 			printf("\nEXECUTION TIME: %f seconds\n\n", cpu_sample_time_used);
 
+			// FREE THE MEMORY
 			freeMemory(&SMPs[z], DIST_S, REW, BEST, NB);
 			/*free(input);*/
-			free(output);
+			//free(output);
 		}
-
+		
+		// UPDATE THE BEST TOTAL SCORE
 		if (total_score > best_total_score)
 		{
 			best_total_score = total_score;
@@ -184,6 +220,7 @@ void main()
 
 	}
 
+	// COMPUTE THE OVERALL EXECUTION TIME
 	very_total_time = clock() - very_total_time;
 
 	double cpu_very_total_time_used = ((double)very_total_time) / CLOCKS_PER_SEC;

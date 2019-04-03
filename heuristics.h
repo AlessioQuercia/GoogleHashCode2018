@@ -17,7 +17,7 @@ float avg_distance(sample *SMP, int xs, int ys);
 int reward(vehicle v, ride r, int dist, int t, int T, int B);
 
 // Returns the reward given by assigning the ride r to the vehicle v at time t
-int reward_v3(sample *SMP, int **DIST_S, vehicle v, ride r, int dist, int t);
+int reward_v3(sample *SMP, int **DIST_S, vehicle v, ride r, int t);
 
 // Returns the wait_time for the couple (vehicle, ride)
 int wait_time(sample *SMP, int **DIST_S, int idv, int idr, int t);
@@ -33,14 +33,19 @@ float variance_reward(sample *SMP, int **REW, int idv, int idr);
 /////////////////////////////////////////////////// VERSION 2 ///////////////////////////////////////////////////
 
 // Initializes the distances from the vehicles to the starting points
-void initialize_best_v2(mixtriple **BEST, int F, int NB);
+void initialize_best_v2(sample *SMP, mixtriple **BEST, int F, int NB, int crit);
+
 // Initializes the values in BEST for each ride of a given vehicle v
-void initialize_best_v2v(mixtriple **BEST, int F, int NB, int idv);
+void initialize_best_v2v_min_max(mixtriple **BEST, int F, int NB, int idv);
+
+// Initializes the values in BEST for each ride of a given vehicle v
+void initialize_best_v2v_max_max(mixtriple **BEST, int F, int NB, int idv);
+
 // Initializes the required structures for v2
 void initialize_structures(sample *SMP, int **DIST_S, mixtriple **BEST, int **REW, int t, int crit, int K);
 
 // Starts a simulation with wait times
-void start_simulation_v2(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int NB, int *slots, int iter, int q);
+void start_simulation_v2(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int NB, int *slots, int iter, int crit, int q);
 
 // Assigns a ride according to a choice_criterium and returns the time required to complete the ride
 int assign_ride(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int idv, int t, int iter, int q, int K);

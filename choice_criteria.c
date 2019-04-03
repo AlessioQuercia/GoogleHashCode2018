@@ -3,17 +3,19 @@
 /////////////////////////////////////////////////// CHOICE CRITERIA VERSION 2 ///////////////////////////////////////////////////
 
 // Choice criterium to store the best ride in BEST: max_reward
-void max_r(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int idv, int idr, int t)
+void max_r(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int idv, int idr, int t)
 {
-	int required_time = t + DIST_S[idv][idr] + WAIT[idv][idr] + SMP->rides[idr].dd;
+	int wt = wait_time(SMP, DIST_S, idv, idr, t);
+
+	int required_time = t + DIST_S[idv][idr] + wt + SMP->rides[idr].dd;
 
 	//printf("%d, %f, %d, %d\n", WAIT[idv][idr], BEST[idv][0].val, t, DIST_S[idv][idr] + SMP->rides[idr].dd);
 
 	// If the wait_time of assigning ride r to vehicle v is smaller than the one in the current slot, update it with the smaller one
-	if (((REW[idv][idr].val < BEST[idv][0].val))											// first criterium: max_reward
+	if (((REW[idv][idr] > BEST[idv][0].val))											// first criterium: max_reward
 		&& required_time <= SMP->rides[idr].f && required_time <= SMP->T)
 	{
-		mixtriple mc = { .val = REW[idv][idr].val,.idr = idr ,.t = required_time };
+		mixtriple mc = { .val = REW[idv][idr],.idr = idr ,.t = required_time };
 
 		BEST[idv][0] = mc;
 	}
@@ -28,7 +30,7 @@ void min_rt_max_r(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int
 
 	// If the wait_time of assigning ride r to vehicle v is smaller than the one in the current slot, update it with the smaller one
 	if (((required_time < BEST[idv][0].t) ||											// first criterium: min_required_time
-		(required_time == BEST[idv][0].t) && (REW[idv][idr].val < BEST[idv][0].val)		// second criterium: max_reward
+		(required_time == BEST[idv][0].t) && (REW[idv][idr].val > BEST[idv][0].val)		// second criterium: max_reward
 		)											
 		&& required_time <= SMP->rides[idr].f && required_time <= SMP->T)
 	{
@@ -188,21 +190,23 @@ void min_wt_min_rt_max_ratio(sample *SMP, int **DIST_S, couple **REW, mixquad **
 
 
 // Choice criterium to store the best ride in BEST: min_wait_time --> min_required_time --> max_reward
-void min_wt_min_rt_max_r(sample *SMP, int **DIST_S, couple **REW, mixtriple **BEST, int **WAIT, int idv, int idr, int t)
+void min_wt_min_rt_max_r(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int idv, int idr, int t)
 {
-	int required_time = t + DIST_S[idv][idr] + WAIT[idv][idr] + SMP->rides[idr].dd;
+	int wt = wait_time(SMP, DIST_S, idv, idr, t);
+
+	int required_time = t + DIST_S[idv][idr] + wt + SMP->rides[idr].dd;
 
 	//printf("%d, %f, %d, %d\n", WAIT[idv][idr], BEST[idv][0].val, t, required_time);
 
 	// If the wait_time of assigning ride r to vehicle v is smaller than the one in the current slot, update it with the smaller one
 	if ((
-		(WAIT[idv][idr] < BEST[idv][0].val)	||																								// first criterium: minimum wait_time
-		(WAIT[idv][idr] == BEST[idv][0].val && required_time < BEST[idv][0].t) ||															// second criterium: minimum required_time
-		(WAIT[idv][idr] == BEST[idv][0].val && required_time == BEST[idv][0].t && REW[idv][idr].val > REW[idv][BEST[idv][0].idr].val)		// third criterium: maximum reward
+		(wt < BEST[idv][0].val)	||																								// first criterium: minimum wait_time
+		(wt == BEST[idv][0].val && required_time < BEST[idv][0].t) ||															// second criterium: minimum required_time
+		(wt == BEST[idv][0].val && required_time == BEST[idv][0].t && REW[idv][idr] > REW[idv][BEST[idv][0].idr])		// third criterium: maximum reward
 		) && required_time <= SMP->rides[idr].f && required_time <= SMP->T)
 	{
 
-		mixtriple mc = { .val = WAIT[idv][idr],.idr = idr ,.t = required_time };
+		mixtriple mc = { .val = wt,.idr = idr ,.t = required_time };
 
 		BEST[idv][0] = mc;
 	}
@@ -294,10 +298,10 @@ void max_u_min_rt_K(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int 
 		int utility = REW[idv][idr] - required_time;
 
 		int j = K-1;
-		while (j >= 0 &&
-			( (utility > BEST[idv][j].val) ||										// First criterium: maximum utility
-			  (utility == BEST[idv][j].val && required_time < BEST[idv][j].t) )		// Second criterium: minimum required_time
-			  )
+		while (j >= 0 && ( 
+			(utility > BEST[idv][j].val) ||										// First criterium: maximum utility
+			(utility == BEST[idv][j].val && required_time < BEST[idv][j].t)		// Second criterium: minimum required_time
+			))
 		{
 			BEST[idv][j + 1] = BEST[idv][j];
 
@@ -305,6 +309,70 @@ void max_u_min_rt_K(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int 
 		}
 
 		mixtriple mc = { .val = utility,.idr = idr ,.t = required_time };
+
+		BEST[idv][j + 1] = mc;
+
+		//printf("%d %d %f\n", j, utility, BEST[idv][0].val);
+	}
+}
+
+// Choice criterium to store the best ride in BEST: min_wait_time --> min_required_time --> max_reward
+void min_wt_min_rt_max_r_K(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int idv, int idr, int t, int K)
+{
+	if (SMP->rides[idr].done == 1)
+		return;
+
+	int wt = wait_time(SMP, DIST_S, idv, idr, t);
+
+	int required_time = t + DIST_S[idv][idr] + wt + SMP->rides[idr].dd;
+
+	if (required_time <= SMP->rides[idr].f && required_time <= SMP->T)
+	{
+		int j = K - 1;
+
+		while (j >= 0 && (
+			(BEST[idv][j].val == -1 || wt < BEST[idv][j].val) ||															// first criterium: minimum wait_time
+			(wt == BEST[idv][j].val && required_time < BEST[idv][j].t) ||													// second criterium: minimum required_time
+			(wt == BEST[idv][j].val && required_time == BEST[idv][j].t && REW[idv][idr] > REW[idv][BEST[idv][j].idr])		// third criterium: maximum reward
+			))
+		{
+			BEST[idv][j + 1] = BEST[idv][j];
+
+			j--;
+		}
+
+		mixtriple mc = { .val = wt,.idr = idr ,.t = required_time };
+
+		BEST[idv][j + 1] = mc;
+
+		//printf("%d %d %f\n", j, utility, BEST[idv][0].val);
+	}
+}
+
+// Choice criterium to store the best ride in BEST: max_reward
+void max_r_K(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int idv, int idr, int t, int K)
+{
+	if (SMP->rides[idr].done == 1)
+		return;
+
+	int wt = wait_time(SMP, DIST_S, idv, idr, t);
+
+	int required_time = t + DIST_S[idv][idr] + wt + SMP->rides[idr].dd;
+
+	if (required_time <= SMP->rides[idr].f && required_time <= SMP->T)
+	{
+		int j = K - 1;
+		//printf("%d vs %f\n", REW[idv][idr], BEST[idv][j].val);
+		while (j >= 0 && (
+			(REW[idv][idr] > BEST[idv][j].val)						// first criterium: max_reward
+			))
+		{
+			BEST[idv][j + 1] = BEST[idv][j];
+
+			j--;
+		}
+
+		mixtriple mc = { .val = REW[idv][idr],.idr = idr ,.t = required_time };
 
 		BEST[idv][j + 1] = mc;
 
