@@ -125,11 +125,11 @@ void start_simulation_v2(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST,
 		//{
 		//	double r = (double)rand() / (double)RAND_MAX;
 
-		//	if (r >= 0.3)
+		//	if (r >= 0.01)
 		//		crit = 0;
-		//	else if (r >= 0.15 && r < 0.3)
+		//	else if (r >= 0.001 && r < 0.01)
 		//		crit = 1;
-		//	else if (r < 0.15) 
+		//	else if (r < 0.001) 
 		//		crit = 2;
 		//}
 
@@ -148,11 +148,11 @@ void start_simulation_v2(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST,
 			//{
 			//	double r = (double)rand() / (double)RAND_MAX;
 
-			//	if (r >= 0.3)
+			//	if (r >= 0.01)
 			//		crit = 0;
-			//	else if (r >= 0.15 && r < 0.3)
+			//	else if (r >= 0.001 && r < 0.01)
 			//		crit = 1;
-			//	else if (r < 0.15)
+			//	else if (r < 0.001)
 			//		crit = 2;
 			//}
 
@@ -194,7 +194,7 @@ int assign_ride(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int idv,
 	int idr = BEST[idv][0].idr;
 
 	// If it's not the first time running the algorithm, add randomness to the choice criterium
-	if (iter > 0 && SMP->N > 3)
+	if (iter > 0 && SMP->N > 3 && K > 2)
 	{
 		double r = (double)rand() / (double)RAND_MAX;
 		double index = pow(r, q) * (K-1);

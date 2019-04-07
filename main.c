@@ -21,7 +21,15 @@ void main()
 	int times = 100;
 	clock_t very_total_time = clock();
 	int best_total_score = 0;
-	int q = 100;
+	int best_index = -1;
+	int q = 1000;
+
+	int second_best_total_score = 0;
+	int second_best_index = -1;
+
+	// NB = K + 1
+	int NB = 3;		// Number of best rides to select for each vehicle (B <= F <= N)
+						// 2 for the best ride for each vehicle
 
 	// INITIALIZING RANDOM SEED
 	int seed = time(NULL);
@@ -38,6 +46,8 @@ void main()
 		int **REW;
 		mixtriple **BEST;
 
+		printf("CYCLE %d\n", h);
+
 		// FOR EACH SAMPLE
 		for (int z = 0; z < nsamples; z++)
 		{
@@ -47,8 +57,12 @@ void main()
 			// RE-iNITIALIZE THE SAMPLE VARIABLES
 			for (int i = 0; i < SMPs[z].F; i++)
 			{
+				SMPs[z].vehicles[i].r = 0;
+				SMPs[z].vehicles[i].c = 0;
 				SMPs[z].vehicles[i].nrd = 0;
 				SMPs[z].vehicles[i].av = 0;
+				SMPs[z].vehicles[i].ds = -1;
+				SMPs[z].vehicles[i].t = 0;
 
 				for (int j = 0; j < SMPs[z].N; j++)
 				{
@@ -99,10 +113,6 @@ void main()
 			//{
 			//	WAIT[i] = calloc(SMP.N, sizeof(int));
 			//}
-
-			// K + 1
-			int NB = 11;		// Number of best rides to select for each vehicle (B <= F <= N)
-							// 1 for the best ride for each vehicle
 
 			// INSTANTIATE THE REWARDS MATRIX
 			int **REW = calloc(SMPs[z].F, sizeof(int *));		// Best rides for each vehicleehic
@@ -163,11 +173,11 @@ void main()
 			//{
 			//	double r = (double)rand() / (double)RAND_MAX;
 
-			//	if (r >= 0.3)
+			//	if (r >= 0.01)
 			//		crit = 0;
-			//	else if (r >= 0.15 && r < 0.3)
+			//	else if (r >= 0.001 && r < 0.01)
 			//		crit = 1;
-			//	else if (r < 0.15)
+			//	else if (r < 0.001)
 			//		crit = 2;
 			//}
 
@@ -208,7 +218,16 @@ void main()
 		// UPDATE THE BEST TOTAL SCORE
 		if (total_score > best_total_score)
 		{
+			second_best_total_score = best_total_score;
 			best_total_score = total_score;
+			second_best_index = best_index;
+			best_index = h;
+		}
+
+		if (total_score > second_best_total_score && total_score != best_total_score)
+		{
+			second_best_total_score = total_score;
+			second_best_index = h;
 		}
 
 		total_time = clock() - total_time;
@@ -216,7 +235,9 @@ void main()
 		double cpu_total_time_used = ((double)total_time) / CLOCKS_PER_SEC;
 
 		printf("TOTAL_SCORE: %d\n", total_score);
-		printf("TOTAL_TIME: %f\n\n\n", cpu_total_time_used);
+		printf("TOTAL_TIME: %f\n", cpu_total_time_used);
+		printf("BEST_TOTAL_SCORE: %d\n", best_total_score);
+		printf("SECOND_BEST_TOTAL_SCORE: %d\n\n\n", second_best_total_score);
 
 	}
 
@@ -226,6 +247,9 @@ void main()
 	double cpu_very_total_time_used = ((double)very_total_time) / CLOCKS_PER_SEC;
 
 	printf("BEST_TOTAL_SCORE: %d\n", best_total_score);
+	printf("SECOND_BEST_TOTAL_SCORE: %d\n", second_best_total_score);
+	printf("BEST_INDEX: %d\n", best_index);
+	printf("SECOND_BEST_INDEX: %d\n", second_best_index);
 	printf("VERY_TOTAL_TIME: %f\n", cpu_very_total_time_used);
 
 }

@@ -352,8 +352,6 @@ int compute_score_v3(char *output_file, sample *SMP)
 	}
 	printf("%d", total_score);
 
-	printf(" EXPERIMENTAL");
-
 	return total_score;
 }
 
