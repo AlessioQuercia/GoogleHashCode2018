@@ -12,7 +12,7 @@ For more info, read the report in the Links section.
 
 ### Greedy
 | Sample           | Result   | Time (s) |
-|------------------|----------|----------|
+| ---------------- | -------- | -------- |
 | a_example        | 10       | 0.005    |
 | b_should_be_easy | 172752   | 0.016    |
 | c_no_hurry       | 15809027 | 3.785    |
@@ -25,7 +25,7 @@ For more info, read the report in the Links section.
 
 ### GRASP
 | Sample           | Result   | Time (s) |
-|------------------|----------|----------|
+| ---------------- | -------- | -------- |
 | a_example        | 10       | 0.002    |
 | b_should_be_easy | 172827   | 0.019    |
 | c_no_hurry       | 15804775 | 3.970    |
@@ -41,4 +41,3 @@ For more info, read the report in the Links section.
 **Report**: https://github.com/AlessioQuercia/GoogleHashCode2018/blob/master/GoogleHashCode2018_AnApproach.pdf
 
 **Google Hash Code 2018**: https://github.com/AlessioQuercia/GoogleHashCode2018/blob/master/hashcode2018_qualification_task.pdf
-
