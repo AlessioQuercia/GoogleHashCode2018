@@ -56,6 +56,12 @@ int wait_time(sample *SMP, int **DIST_S, int idv, int idr, int t)
 	return max(0, SMP->rides[idr].s - (t + DIST_S[idv][idr]));	// max( 0, earliest_start - (current_t + distance_vechicle_ride) )
 }
 
+// Returns the wait_time for the couple (vehicle, ride)
+int late_time(sample *SMP, int **DIST_S, int idv, int idr, int t)
+{
+	return abs(min(0, SMP->rides[idr].s - (t + DIST_S[idv][idr])));	// min( 0, earliest_start - (current_t + distance_vechicle_ride) )
+}
+
 
 // Returns the variance of an element
 float variance_reward(sample *SMP, int **REW, int idv, int idr)

@@ -291,11 +291,13 @@ void max_u_min_rt_K(sample *SMP, int **DIST_S, int **REW, mixtriple **BEST, int 
 
 	int wt = wait_time(SMP, DIST_S, idv, idr, t);
 
+	int lt = late_time(SMP, DIST_S, idv, idr, t);	// late time is the amount of steps the vehicle is late with respect to the ride earliest start (0 if it is on time or if it arrived earlier)
+
 	int required_time = t + DIST_S[idv][idr] + wt + SMP->rides[idr].dd;
 
 	if (required_time <= SMP->rides[idr].f && required_time <= SMP->T)
 	{
-		int utility = REW[idv][idr] - required_time;
+		int utility = REW[idv][idr] - required_time - lt;
 
 		int j = K-1;
 		while (j >= 0 && ( 

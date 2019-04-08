@@ -8,6 +8,11 @@
        __typeof__ (b) _b = (b); \
      _a > _b ? _a : _b; })
 
+#define min(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a < _b ? _a : _b; })
+
 // Computes and returns the distance between beginning intersection [a,b] and destination intersection [x,y]
 int distance(int a, int b, int x, int y);
 
@@ -21,6 +26,9 @@ int reward_v3(sample *SMP, int **DIST_S, vehicle v, ride r, int t);
 
 // Returns the wait_time for the couple (vehicle, ride)
 int wait_time(sample *SMP, int **DIST_S, int idv, int idr, int t);
+
+// Returns the late_time for the couple (vehicle, ride)
+int late_time(sample *SMP, int **DIST_S, int idv, int idr, int t);
 
 // Returns the variance of an element
 float variance_required_time(sample *SMP, int **REW, int **DIST_S, int **WAIT, int idv, int t, int required_time);

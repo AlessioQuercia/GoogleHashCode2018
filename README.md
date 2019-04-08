@@ -13,28 +13,28 @@ For more info, read the report in the Links section.
 ### Greedy
 | Sample           | Result   | Time (s) |
 | ---------------- | -------- | -------- |
-| a_example        | 10       | 0.005    |
-| b_should_be_easy | 172752   | 0.016    |
-| c_no_hurry       | 15809027 | 3.785    |
-| d_metropolis     | 11281285 | 4.053    |
-| e_high_bonus     | 20646945 | 4.053    |
+| a_example        | 10       | 0.004    |
+| b_should_be_easy | 173977   | 0.018    |
+| c_no_hurry       | 15809027 | 3.713    |
+| d_metropolis     | 11209219 | 3.941    |
+| e_high_bonus     | 21068945 | 3.989    |
 
-**Total score**: 47910019.
+**Total score**: 48261178.
 
 **Total execution time**: 12 seconds.
 
 ### GRASP
 | Sample           | Result   | Time (s) |
 | ---------------- | -------- | -------- |
-| a_example        | 10       | 0.002    |
-| b_should_be_easy | 172827   | 0.019    |
-| c_no_hurry       | 15804775 | 3.970    |
-| d_metropolis     | 11339771 | 4.235    |
-| e_high_bonus     | 20662945 | 4.297    |
+| a_example        | 10       | 0.003    |
+| b_should_be_easy | 173977   | 0.015    |
+| c_no_hurry       | 15809650 | 4.057    |
+| d_metropolis     | 11254423 | 4.549    |
+| e_high_bonus     | 21099945 | 4.237    |
 
-**Total score**: 47980328.
+**Total score**: 48338005.
 
-**Total execution time**: 22 minutes.
+**Total execution time**: 20 minutes.
 
 ## Links
 

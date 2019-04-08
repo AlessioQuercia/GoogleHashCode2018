@@ -103,3 +103,12 @@ c_no_hurry: 15809027 in 3.785000 seconds
 d_metropolis: 11281285 in 4.053000 seconds
 e_high_bonus: 20646945 in 4.053000 seconds
 Totale: 47910019
+
+
+V4 (MAX_UTILITY --> MIN_REQUIRED_TIME considering also the late time as a malus in the utility)
+a_example: 10 in  0.004000 seconds
+b_should_be_easy: 173977 in 0.018000 seconds
+c_no_hurry: 15809027 in 3.713000 seconds
+d_metropolis: 11209219 in 3.941000 seconds
+e_high_bonus: 21068945 in 3.989000 seconds
+Totale: 48261178 in 11.669000 seconds
