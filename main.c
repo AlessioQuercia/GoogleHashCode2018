@@ -246,6 +246,7 @@ void main()
 
 	double cpu_very_total_time_used = ((double)very_total_time) / CLOCKS_PER_SEC;
 
+	printf("SEED: %d\n", seed);
 	printf("BEST_TOTAL_SCORE: %d\n", best_total_score);
 	printf("SECOND_BEST_TOTAL_SCORE: %d\n", second_best_total_score);
 	printf("BEST_INDEX: %d\n", best_index);
