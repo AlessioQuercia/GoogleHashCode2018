@@ -6,7 +6,7 @@ The repository is intended to keep track of files needed to solve Google HashCod
 ## Info
 The project shows a possible approach to the Google Hash Code 2018 Online Qualification round problem, that is an optimization problem to be solved within 4 hours. This constraint has been ignored, given that this approach has been developed after the competition for academic purposes. The main goal was to solve the problem in an efficient way, using an heuristic (or metaheuristic) approach. To achieve this goal, different greedy approaches have been developed and compared by looking at their results. Then, the best performing one has been used as a base to build a GRASP (Greedy Randomized Adaptive Search Procedure) heuristic approach. Indeed, randomness has been added to the greedy in the choice criterion, allowing the algorithm to make choices that are not always the best ones.
 
-For more info, read the report in the Links section.
+For more info, read the report inside the repository.
 
 ## Score
 
@@ -35,9 +35,3 @@ For more info, read the report in the Links section.
 **Total score**: 48338005.
 
 **Total execution time**: 20 minutes.
-
-## Links
-
-**Report**: https://github.com/AlessioQuercia/GoogleHashCode2018/blob/master/GoogleHashCode2018_AnApproach.pdf
-
-**Google Hash Code 2018**: https://github.com/AlessioQuercia/GoogleHashCode2018/blob/master/hashcode2018_qualification_task.pdf
