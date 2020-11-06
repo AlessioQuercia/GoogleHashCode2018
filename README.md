@@ -23,6 +23,8 @@ For more info, read the report inside the repository.
 
 **Total execution time**: 12 seconds.
 
+**Hypotetical position in [ranking](https://codingcompetitions.withgoogle.com/hashcode/archive/2018)**: 337.
+
 ### GRASP
 | Sample           | Result   | Time (s) |
 | ---------------- | -------- | -------- |
@@ -35,3 +37,5 @@ For more info, read the report inside the repository.
 **Total score**: 48338005.
 
 **Total execution time**: 20 minutes.
+
+**Hypotetical position in [ranking](https://codingcompetitions.withgoogle.com/hashcode/archive/2018)**: 323.
